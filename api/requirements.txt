@@ -1,0 +1,25 @@
+# FastAPI y servidor
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Base de datos SQL Server
+sqlalchemy==2.0.23
+pyodbc==5.0.1
+
+# Firestore (NoSQL)
+google-cloud-firestore==2.13.1
+
+# Procesamiento PDF
+PyMuPDF==1.23.8
+
+# Validación y configuración
+pydantic==2.5.0
+pydantic-settings==2.1.0
+python-dotenv==1.0.0
+
+# Monitoreo
+prometheus-client==0.19.0
+
+# Utilidades
+typing-extensions==4.8.0

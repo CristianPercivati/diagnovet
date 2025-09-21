@@ -1,0 +1,9 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 402 575" width="402" height="575">
+	<title>capa 3</title>
+	<defs>
+		<image  width="11" height="12" id="img1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAMBAMAAABGh1qtAAAAAXNSR0IB2cksfwAAAA9QTFRF/wAA/wAA/wAA/wAA/wAAdlfsCAAAAAV0Uk5TAP+U/hUBlji0AAAAPElEQVR4nDWKQQ0AIAzEegpgCgj+TeAECcPBGEt4Nb2e1HEQBnFEamJue1DL4NWIaox/IVenUNZnWw8HLvfDEU0mOClFAAAAAElFTkSuQmCC"/>
+	</defs>
+	<style>
+	</style>
+	<use id="Capa 9" href="#img1" x="168" y="98"/>
+</svg>
