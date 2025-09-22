@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/dashboard/sidebar";
 import InfoTabs from "@/components/dashboard/infoTabs";
 import Viewer from "@/components/dashboard/viewer";
+import { API_BASE_URL } from '@/app/config'
 
 export default function HomePage() {
   const [patients, setPatients] = useState<any[]>([]);
@@ -16,7 +17,7 @@ export default function HomePage() {
 
   // 🔹 Fetch lista de pacientes
   useEffect(() => {
-    fetch("http://localhost:8000/all_diagnoses")
+    fetch(`${API_BASE_URL}/all_diagnoses`)
       .then((res) => res.json())
       .then((data) => setPatients(data))
       .catch(() => setPatients([]));
@@ -26,11 +27,17 @@ export default function HomePage() {
   useEffect(() => {
     if (!selectedPatientId) return;
     setLoading(true);
-    fetch(`http://localhost:8000/diagnosis/${selectedPatientId}`)
+    fetch(`${API_BASE_URL}/diagnosis/${selectedPatientId}`)
       .then((res) => res.json())
       .then((data) => setPatientData(data))
       .finally(() => setLoading(false));
   }, [selectedPatientId]);
+
+  useEffect(() => {
+  if (patients.length > 0 && selectedPatientId === null) {
+    setSelectedPatientId(patients[0].id);
+  }
+}, [patients, selectedPatientId]);
 
   return (
     <div className="screen dashboard-screen">

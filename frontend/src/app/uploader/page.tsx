@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { N8N_BASE_URL } from "../config";
 
 interface FileStatus {
   file: File;
@@ -35,7 +36,8 @@ export default function HomePage() {
         formData.append("file", updatedFiles[i].file);
 
         const res = await fetch(
-          "http://localhost:5678/webhook/pdf-upload",
+          `${N8N_BASE_URL}/webhook-test/pdf-upload`,
+          //`${N8N_BASE_URL}/webhook/pdf-upload`,
           {
             method: "POST",
             body: formData,
@@ -57,7 +59,8 @@ export default function HomePage() {
 
   return (
     <div className="screen dashboard-screen flex items-center justify-center p-8">
-      <div className="uploader w-full max-w-lg bg-white rounded-2xl shadow-lg p-8 flex flex-col gap-6">
+      <div className="uploader">
+
         <h3 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
           Subir PDFs al pipeline
         </h3>
@@ -71,7 +74,7 @@ export default function HomePage() {
             onChange={handleFilesChange}
             className="hidden"
           />
-          <div className="bg-blue-500 hover:bg-green-600 text-white font-medium px-6 py-3 rounded-xl text-center transition">
+          <div className="upload-btn">
             Seleccionar archivos
           </div>
         </label>
@@ -105,10 +108,10 @@ export default function HomePage() {
               return (
                 <li
                   key={i}
-                  className={`flex justify-between items-center p-3 rounded-xl border border-gray-200 ${statusClass}`}
+                  className={`file-item ${statusClass}`} // statusClass sería "status-pending", etc.
                 >
-                  <span className="truncate">{f.file.name}</span>
-                  <span className="font-medium">{statusText}</span>
+                  <span className="file-name">{f.file.name}</span>
+                  <span className="status-badge">{statusText}</span>
                 </li>
               );
             })}
@@ -117,20 +120,16 @@ export default function HomePage() {
 
         {/* Botón enviar */}
         <button
-          onClick={uploadFiles}
-          disabled={
-            loading ||
-            files.length === 0 ||
-            files.every((f) => f.status === "success")
-          }
-          className={`w-full py-3 rounded-xl font-semibold text-white transition ${
-            loading || files.every((f) => f.status === "success")
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-green-500 hover:bg-green-600"
-          }`}
-        >
-          {loading ? "Procesando..." : "Enviar al pipeline"}
-        </button>
+  onClick={uploadFiles}
+  disabled={
+    loading ||
+    files.length === 0 ||
+    files.every((f) => f.status === "success")
+  }
+  className="submit-btn"
+>
+  {loading ? "Procesando..." : "Enviar al pipeline"}
+</button>
       </div>
     </div>
   );

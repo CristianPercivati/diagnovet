@@ -196,6 +196,7 @@ h1 {
 .main-content {
     display: flex;
     flex: 1;
+    min-height: 70vh;
     max-height: 650px;
 }
 
@@ -347,10 +348,12 @@ h1 {
 .carousel-container {
     display: flex;
     gap: 10px;
-    overflow-x: auto;
-    overflow-y: auto ;
+    overflow-x:scroll;
+    overflow-y: hidden ;
     padding-bottom: 10px;
-    min-height: 250px;
+    min-height: 10vh;
+    max-height: 20vh;
+    max-width: 120vh;
 }
 
 .carousel-image {
@@ -491,3 +494,119 @@ h1 {
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
+.uploader {
+  width: 500px; /* Reducir el ancho máximo */
+  margin: 40px auto; /* Centrar vertical y horizontalmente */
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.upload-btn {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  display: inline-block;
+  width: auto;
+}
+
+.upload-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+}
+
+.file-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+.file-item:hover {
+  background: #f8f9fa;
+}
+
+.file-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 10px;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  min-width: 85px;
+  text-align: center;
+}
+
+.status-pending {
+  background: #fff3e0;
+  color: #FF9800;
+}
+
+.status-uploading {
+  background: #e3f2fd;
+  color: #2196F3;
+}
+
+.status-success {
+  background: #e8f5e8;
+  color: #4CAF50;
+}
+
+.status-error {
+  background: #ffebee;
+  color: #f44336;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #2c3e50, #34495e);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(44, 62, 80, 0.4);
+}
+
+.submit-btn:disabled {
+  background: #e1e5e9;
+  color: #999;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

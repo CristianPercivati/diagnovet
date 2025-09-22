@@ -8,6 +8,7 @@ export const metadata = {
   description: 'Plataforma de diagnóstico veterinario',
 }
 
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es">

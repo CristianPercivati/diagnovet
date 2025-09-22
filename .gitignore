@@ -3,3 +3,4 @@ node_modules
 .next
 __pycache__
 extracted_images/
+diagnovet-sa-key.json

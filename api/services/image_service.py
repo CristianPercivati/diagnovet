@@ -8,7 +8,7 @@ import logging
 from io import BytesIO
 from utils.cnn_classifier import load_model, cnn_inference
 from PIL import Image
-
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +23,12 @@ class ImageService:
             raise HTTPException(status_code=400, detail="Solo se admiten archivos PDF.")
         
         try:
+            # Normalización del nombre
+            #normalized_name = self.normalize_filename(filename)
             # Crear carpeta específica para este PDF
-            folder_name = filename.replace(".pdf", "_images")
+            #folder_name = filename.replace(".pdf", "_images")
+            next_number = self.get_next_folder_number()
+            folder_name = f'{next_number}_images'
             output_folder = os.path.join(self.images_directory, folder_name)
             os.makedirs(output_folder, exist_ok=True)
             
@@ -108,3 +112,23 @@ class ImageService:
                         total_images += 1
         
         return total_images
+    def get_next_folder_number(self) -> int:
+        """Obtener el próximo número secuencial para carpeta de imágenes"""
+
+        if not os.path.exists(self.images_directory):
+            return 1
+        
+        # Buscar todas las carpetas que siguen el patrón numérico
+        folder_pattern = re.compile(r'^(\d+)_images$')
+        numbers = []
+        
+        for item in os.listdir(self.images_directory):
+            if os.path.isdir(os.path.join(self.images_directory, item)):
+                match = folder_pattern.match(item)
+                if match:
+                    numbers.append(int(match.group(1)))
+        
+        if not numbers:
+            return 1
+        
+        return max(numbers) + 1

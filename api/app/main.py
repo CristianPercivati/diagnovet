@@ -14,6 +14,10 @@ from app.config import settings
 import logging
 from typing import List
 
+from urllib.parse import unquote
+import unicodedata
+
+
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

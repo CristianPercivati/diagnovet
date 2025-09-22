@@ -36,7 +36,10 @@ class RepositoryFactory:
                 if not settings.firestore_project_id:
                     raise ValueError("FIRESTORE_PROJECT_ID no configurado")
                 
-                repo = FirestoreRepository(settings.firestore_project_id)
+                repo = FirestoreRepository(
+                    project_id=settings.firestore_project_id,
+                    credentials_path=settings.firestore_credentials_path
+                )
                 metrics_collector.update_database_status("firestore", True)
                 return repo
             

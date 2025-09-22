@@ -19,9 +19,7 @@ const InfoTabs: React.FC<InfoTabsProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState("diagnostico");
   const [selectedValue, setSelectedValue] = useState<string>("normal");
-  const [selectedStudyIndex, setSelectedStudyIndex] = useState<number | null>(
-    0
-  );
+  const [selectedStudyIndex, setSelectedStudyIndex] = useState<number | null>(0);
   const [images, setImages] = useState<string[]>([]);
 
   // fetch de imágenes (solo si cambio tab a "imagenes")
@@ -36,6 +34,15 @@ const InfoTabs: React.FC<InfoTabsProps> = ({
       .then((data) => setImages(data.images ?? []))
       .catch(() => setImages([]));
   }, [activeTab, patientData]);
+
+useEffect(() => {
+  setSelectedValue("normal");
+  setSelectedStudyIndex(0);
+  onChangeImageMode([]);
+  onSelectImage(null);
+  onChangeImageData(null);
+}, [patientData]);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;

@@ -1,4 +1,5 @@
 'use client'
+import { API_BASE_URL } from "@/app/config";
 import React, { useState, useRef } from "react";
 
 
@@ -86,7 +87,7 @@ const urinaryFemale = [
   if (urinaryFemale.some(o => organs.includes(o))) {
     mode = "urinary_system_female";
   }}
-  const baseImage = selectedImage ? `http://localhost:8000${selectedImage}` : (baseImages[mode] || baseImages["normal"]);
+  const baseImage = selectedImage ? `${API_BASE_URL}${selectedImage}` : (baseImages[mode] || baseImages["normal"]);
   const zoomRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -134,13 +135,15 @@ const urinaryFemale = [
               onMouseLeave={handleMouseLeave}
               style={{
                 position: "absolute",
-                top: -12,
+                top: 0,
                 left: 0,
                 width: "100%",
                 height: "100%",
                 backgroundImage: `url(${overlay.src})`,
-                backgroundSize: "cover",
+                backgroundSize: "contain",
                 backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                alignItems: "center",
                 opacity: 0.8,
                 transition: "transform 0.3s ease, transform-origin 0.1s",
                 pointerEvents: "none",
@@ -158,8 +161,8 @@ const urinaryFemale = [
                 position: "absolute",
                 top: 0,
                 left: 0,
-                width: "100%",
-                height: "100%",
+                
+                height: "500px",
                 backgroundImage: `url(${selectedImage || baseImage})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
