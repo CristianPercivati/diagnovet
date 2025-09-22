@@ -288,3 +288,26 @@ class SQLRepository(BaseRepository):
     async def create_veterinarian(self, vet_data: Dict[str, Any]) -> str:
         # Implementación similar
         pass
+
+    async def delete_all_data(self) -> bool:
+            """Elimina todos los datos de la base SQL manteniendo las tablas"""
+            session = self.session_factory()
+            try:
+                # Orden de eliminación para respetar constraints de FK
+                session.query(Observaciones).delete()
+                session.query(Mediciones).delete()
+                session.query(Estudios).delete()
+                session.query(Informes).delete()
+                session.query(Pacientes).delete()
+                session.query(Veterinarios).delete()
+                
+                
+                session.commit()
+                return True
+                
+            except Exception as e:
+                session.rollback()
+                logger.error(f"Error eliminando datos SQL: {str(e)}")
+                raise e
+            finally:
+                session.close()

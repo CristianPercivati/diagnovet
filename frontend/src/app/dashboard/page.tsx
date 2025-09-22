@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Sidebar from "@/components/dashboard/sidebar";
-import InfoTabs from "@/components/dashboard/infoTabs";
-import Viewer from "@/components/dashboard/viewer";
+import Sidebar from "@/components/dashboard/Sidebar";
+import InfoTabs from "@/components/dashboard/InfoTabs";
+import Viewer from "@/components/dashboard/Viewer";
 import { API_BASE_URL } from '@/app/config'
 
 export default function HomePage() {
@@ -15,7 +15,6 @@ export default function HomePage() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageData, setImageData] = useState<any>(null);
 
-  // 🔹 Fetch lista de pacientes
   useEffect(() => {
     fetch(`${API_BASE_URL}/all_diagnoses`)
       .then((res) => res.json())
@@ -23,7 +22,6 @@ export default function HomePage() {
       .catch(() => setPatients([]));
   }, []);
 
-  // 🔹 Fetch paciente seleccionado
   useEffect(() => {
     if (!selectedPatientId) return;
     setLoading(true);

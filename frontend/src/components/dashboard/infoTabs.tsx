@@ -1,14 +1,26 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { PatientData, Study, Measurement } from "@/types/patient";
+import TabNavigation from "./TabNavigation";
+import StudySelector from "./StudySelector";
+import DiagnosisSection from "./DiagnosisSection";
+import ObservationsSection from "./ObservationsSection";
+import MeasurementGrid from "./MeasurementGrid";
+import ImageCarousel from "./ImageCarousel";
+import LoadingSpinner from "../common/LoadingSpinner";
+
+import { API_BASE_URL } from "@/app/config";
 
 interface InfoTabsProps {
-  patientData: any;
+  patientData: PatientData | null;
   loading: boolean;
   onChangeImageMode: (organs: string[]) => void;
   onSelectImage: (imgUrl: string | null) => void;
-  onChangeImageData: (data: any) => void;
+  onChangeImageData: (data: Measurement[] | null) => void;
 }
+
+type TabType = "diagnostico" | "observaciones" | "mediciones" | "recomendaciones" | "imagenes";
 
 const InfoTabs: React.FC<InfoTabsProps> = ({
   patientData,
@@ -17,168 +29,100 @@ const InfoTabs: React.FC<InfoTabsProps> = ({
   onSelectImage,
   onChangeImageData,
 }) => {
-  const [activeTab, setActiveTab] = useState("diagnostico");
+  const [activeTab, setActiveTab] = useState<TabType>("diagnostico");
   const [selectedValue, setSelectedValue] = useState<string>("normal");
-  const [selectedStudyIndex, setSelectedStudyIndex] = useState<number | null>(0);
+  const [selectedStudyIndex, setSelectedStudyIndex] = useState<number | null>(null);
   const [images, setImages] = useState<string[]>([]);
 
-  // fetch de imágenes (solo si cambio tab a "imagenes")
+  const tabs: TabType[] = ["diagnostico", "observaciones", "mediciones", "recomendaciones", "imagenes"];
+
+  // Fetch imágenes cuando se selecciona la tab de imágenes
   useEffect(() => {
-    if (activeTab !== "imagenes" || !patientData) return;
-    const folderUrl = patientData?.img_folder;
+    
+    if (activeTab !== "imagenes" || !patientData?.img_folder) return;
+    console.log("asdasdasdas")
+    const fetchImages = async () => {
+      try {
+        const folderUrl = patientData.img_folder;
+        console.log("asdasd2",folderUrl)
+        const response = await fetch(`${API_BASE_URL}/images/${folderUrl}`);
+        const data = await response.json();
+        setImages(data.images ?? []);
+      } catch (error) {
+        console.error("Error fetching images:", error);
+        setImages([]);
+      }
+    };
 
-    if (!folderUrl) return;
-
-    fetch(`http://localhost:8000/images/${folderUrl}`)
-      .then((res) => res.json())
-      .then((data) => setImages(data.images ?? []))
-      .catch(() => setImages([]));
+    fetchImages();
   }, [activeTab, patientData]);
 
-useEffect(() => {
-  setSelectedValue("normal");
-  setSelectedStudyIndex(0);
-  onChangeImageMode([]);
-  onSelectImage(null);
-  onChangeImageData(null);
-}, [patientData]);
+  useEffect(() => {
+    setSelectedValue("normal");
+    setSelectedStudyIndex(null);
+    onChangeImageMode([]);
+    onSelectImage(null);
+    onChangeImageData(null);
+  }, [patientData, onChangeImageMode, onSelectImage, onChangeImageData]);
 
-
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    const selectedOption = e.target.selectedOptions[0];
-    const mediciones = selectedOption
-      ? selectedOption.dataset.mediciones
-      : "[]";
-    const medicionesParsed = JSON.parse(mediciones || "[]");
-
+  const handleStudyChange = (value: string, studyIndex: number | null, measurements: Measurement[]) => {
     setSelectedValue(value);
+    setSelectedStudyIndex(studyIndex);
 
     if (value === "normal") {
       onChangeImageMode([]);
-      setSelectedStudyIndex(-1);
+      onChangeImageData(null);
     } else {
-      const arr = value
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-
-      const normalize = (str: string) =>
-        str
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "");
-
-      const organsLower = arr.map(normalize);
-
-      const indexAttr = selectedOption.getAttribute("data-index");
-      const studyIndex = indexAttr !== null ? parseInt(indexAttr, 10) : null;
-
-      setSelectedStudyIndex(studyIndex);
-      onChangeImageMode(organsLower);
-      onSelectImage(null);
-      onChangeImageData(medicionesParsed);
+      const organs = value.split(",").map(s => s.trim()).filter(Boolean);
+      const normalizedOrgans = organs.map(org => 
+        org.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      );
+      
+      onChangeImageMode(normalizedOrgans);
+      onChangeImageData(measurements);
     }
+    
+    onSelectImage(null);
   };
 
+  const getCurrentStudy = (): Study | null => {
+    if (selectedStudyIndex === null || !patientData?.estudios) return null;
+    return patientData.estudios[selectedStudyIndex] || null;
+  };
+
+  const renderTabContent = () => {
+    if (loading) {
+      return <LoadingSpinner text="Cargando datos del paciente..." />;
+    }
+
+    if (!patientData) {
+      return <p>No hay datos disponibles para el paciente seleccionado.</p>;
+    }
+
+    const currentStudy = getCurrentStudy();
+
+    switch (activeTab) {
+      case "diagnostico":
+        return <DiagnosisSection diagnostico={patientData.diagnostico} />;
+
+case "observaciones":
   return (
-    <div className="info-tabs">
-      <div className="tab-nav">
-        {["diagnostico", "observaciones", "mediciones", "recomendaciones", "imagenes"].map(
-          (tab) => (
-            <button
-              key={tab}
-              className={`tab-btn ${activeTab === tab ? "active" : ""}`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab[0].toUpperCase() + tab.slice(1)}
-            </button>
-          )
-        )}
+    <ObservationsSection 
+      observations={currentStudy?.observaciones || []} 
+      noDataMessage={!currentStudy ? "Selecciona un estudio para ver las observaciones" : "No hay observaciones para este estudio"}
+    />
+  );
 
-        <select className="filter-select" value={selectedValue} onChange={handleChange}>
-          {loading ? (
-            <option>Cargando...</option>
-          ) : patientData?.estudios?.length ? (
-            <>
-              <option value="normal">Normal</option>
-              {patientData.estudios.map((estudio: any, index: number) => {
-                const organos = [
-                  ...new Set(estudio.mediciones.map((m: any) => m.organo)),
-                ];
-                console.log("Estudios del paciente:", patientData?.estudios);
+      case "mediciones":
+        return (
+          <MeasurementGrid 
+            measurements={currentStudy?.mediciones || []}
+            noDataMessage={!currentStudy ? "Selecciona un estudio para ver las mediciones" : undefined}
+          />
+        );
 
-                return (
-                  <option
-                    key={index}
-                    data-index={index}
-                    value={organos.join(",")}
-                    data-mediciones={JSON.stringify(estudio.mediciones)}
-                  >
-                    {estudio.tipo_estudio ?? `Estudio ${index + 1}`}
-                  </option>
-                );
-              })}
-            </>
-          ) : (
-            <option>No hay estudios disponibles</option>
-          )}
-        </select>
-      </div>
-
-      <div className="tab-content">
-        {activeTab === "diagnostico" && (
-          <div className="info-section">
-            <h4>🎯 Diagnóstico Principal</h4>
-            {loading ? (
-              <p>Cargando...</p>
-            ) : patientData ? (
-              <ul>
-                {(patientData.diagnostico
-                  ? patientData.diagnostico.split(";").map((d: string) => d.trim())
-                  : []
-                ).map((diag: string, i: number) => (
-                  <li key={i}>{diag}</li>
-                ))}
-              </ul>
-            ) : (
-              <p>No hay diagnóstico disponible.</p>
-            )}
-          </div>
-        )}
-
-        {activeTab === "observaciones" && selectedStudyIndex !== null && (
-          <div className="info-section">
-            <h4>👀 Observaciones</h4>
-            {patientData?.estudios?.[selectedStudyIndex]?.observaciones?.map(
-              (obs: any, i: number) => (
-                <p key={i}>
-                  <strong>{obs.organo}:</strong> {obs.observacion}
-                </p>
-              )
-            )}
-          </div>
-        )}
-
-        {activeTab === "mediciones" && selectedStudyIndex !== null && (
-          <div className="info-section">
-            <h4>📊 Mediciones Clave</h4>
-            <div className="measurement-grid">
-              {patientData?.estudios?.[selectedStudyIndex]?.mediciones?.map(
-                (m: any, i: number) => (
-                  <div key={i} className="measurement-card">
-                    <div className="measurement-label">{m.tipo_medicion}</div>
-                    <div className="measurement-value">
-                      {m.valor} {m.unidad ?? ""}
-                    </div>
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-        )}
-
-        {activeTab === "recomendaciones" && (
+      case "recomendaciones":
+        return (
           <div className="info-section">
             <h4>📝 Recomendaciones</h4>
             <p>
@@ -186,33 +130,42 @@ useEffect(() => {
               Evaluar tratamiento para bronquitis crónica y control cardíaco.
             </p>
           </div>
-        )}
+        );
 
-        {activeTab === "imagenes" && (
-          <div className="info-section">
-            <h4>🖼️ Imágenes</h4>
-            {loading ? (
-              <p>Cargando...</p>
-            ) : images.length ? (
-              <div className="carousel-container">
-                {images.map((imgUrl, i) => (
-                  <div
-                    key={i}
-                    className="carousel-image"
-                    onClick={() => onSelectImage(imgUrl)}
-                  >
-                    <img
-                      src={`http://localhost:8000${imgUrl}`}
-                      alt={`Imagen ${i + 1}`}
-                    />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p>No hay imágenes disponibles.</p>
-            )}
-          </div>
-        )}
+      case "imagenes":
+        return (
+          <ImageCarousel 
+            images={images}
+            selectedImage={null}
+            onImageSelect={onSelectImage}
+            loading={activeTab === "imagenes" && images.length === 0 && patientData.paciente.img_folder !== undefined}
+          />
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="info-tabs">
+      <div className="tab-nav">
+        <TabNavigation 
+          tabs={tabs} 
+          activeTab={activeTab} 
+          onTabChange={setActiveTab} 
+        />
+        
+        <StudySelector
+          studies={patientData?.estudios || []}
+          selectedValue={selectedValue}
+          onStudyChange={handleStudyChange}
+          loading={loading}
+        />
+      </div>
+
+      <div className="tab-content">
+        {renderTabContent()}
       </div>
     </div>
   );

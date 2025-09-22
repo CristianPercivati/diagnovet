@@ -39,3 +39,8 @@ class BaseRepository(ABC):
     async def create_veterinarian(self, vet_data: Dict[str, Any]) -> str:
         """Crear un nuevo veterinario"""
         pass
+    
+    @abstractmethod
+    async def delete_all_data(self) -> bool:
+        """Elimina todos los datos manteniendo las estructuras"""
+        pass

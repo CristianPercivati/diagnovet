@@ -288,3 +288,40 @@ class FirestoreRepository(BaseRepository):
             'created_at': firestore.SERVER_TIMESTAMP
         })
         return vet_id
+
+    async def delete_all_data(self) -> bool:
+            """Elimina todos los documentos de Firestore manteniendo las colecciones"""
+            try:
+                batch = self.db.batch()
+                
+                # Eliminar todos los documentos de cada colección
+                collections_to_clear = [
+                    self.collections['observations'],
+                    self.collections['measurements'], 
+                    self.collections['studies'],
+                    self.collections['diagnoses'],
+                    self.collections['patients'],
+                    self.collections['veterinarians']
+                ]
+                
+                deleted_count = 0
+                for collection_name in collections_to_clear:
+                    docs = self.db.collection(collection_name).stream()
+                    for doc in docs:
+                        batch.delete(doc.reference)
+                        deleted_count += 1
+                        
+                        # Firestore limita los batches a 500 operaciones
+                        if deleted_count % 450 == 0:
+                            batch.commit()
+                            batch = self.db.batch()
+                
+                # Commit final
+                if deleted_count % 450 != 0:
+                    batch.commit()
+                    
+                return True
+                
+            except Exception as e:
+                logger.error(f"Error eliminando datos Firestore: {str(e)}")
+                raise e

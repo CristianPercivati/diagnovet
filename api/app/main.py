@@ -169,6 +169,33 @@ async def health_check():
         logger.error(f"Health check failed: {str(e)}")
         raise HTTPException(status_code=503, detail="Service unavailable")
 
+@app.get("/delete-all")
+async def delete_all_data(
+    service: DiagnosisService = Depends(get_diagnosis_service),
+):
+    """
+    Elimina todos los datos del sistema manteniendo las estructuras.
+    
+    ⚠️ **ADVERTENCIA**: Esta operación es irreversible y elimina todos los datos.
+    Solo para uso en desarrollo/testing.
+    """
+    try:
+        success = await service.delete_all_data()
+        
+        if success:
+            return {"message": "Todos los datos han sido eliminados exitosamente"}
+        else:
+            raise HTTPException(
+                status_code=500, 
+                detail="Error al eliminar los datos"
+            )
+            
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error eliminando datos: {str(e)}"
+        )
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

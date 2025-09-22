@@ -34,11 +34,14 @@ const overlays = {
   neck: [],
   head: [],
   urinary_system_female: [
-    { src: "/assets/viewer/urinary_system/glandula_suprarenal.svg", active: organs.includes("glándula suprarrenal"), danger: 1 },
-    { src: "/assets/viewer/urinary_system/utero.svg", active: organs.includes("útero"), danger: 1 },
-    { src: "/assets/viewer/urinary_system/ovario_izquierdo.svg", active: organs.includes("ovario"), danger: 1 },
+    { src: "/assets/viewer/urinary_system/glandula_suprarenal.svg", active: organs.includes("glandula suprarenal derecha"), danger: 1 },
+    { src: "/assets/viewer/urinary_system/glandula_suprarenal.svg", active: organs.includes("glandula suprarenal izquierda"), danger: 1 },
+    { src: "/assets/viewer/urinary_system/utero.svg", active: organs.includes("utero"), danger: 1 },
+    { src: "/assets/viewer/urinary_system/ovario_izquierdo.svg", active: organs.includes("ovario izquierdo"), danger: 1 },
+    { src: "/assets/viewer/urinary_system/ovario_derecho.svg", active: organs.includes("ovario derecho"), danger: 1 },
   ]
 };
+console.log(organs)
 let mode = "normal"
 const razaAImagen = {
   'doberman': "/assets/viewer/dog_1/dog_1.svg",
@@ -87,7 +90,7 @@ const urinaryFemale = [
   if (urinaryFemale.some(o => organs.includes(o))) {
     mode = "urinary_system_female";
   }}
-  const baseImage = selectedImage ? `${API_BASE_URL}${selectedImage}` : (baseImages[mode] || baseImages["normal"]);
+  const baseImage = selectedImage ? `${selectedImage}` : (baseImages[mode] || baseImages["normal"]);
   const zoomRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {

@@ -101,3 +101,22 @@ class DiagnosisService:
                     raise ValueError("El valor de la medición debe ser positivo")
                 if not medicion.organo:
                     raise ValueError("El órgano de la medición es obligatorio")
+
+    async def delete_all_data(self) -> bool:
+        """Elimina todos los datos del sistema - Este servicio quizás no debería estar acá, pero por simplicidad..."""
+        start_time = time.time()
+        
+        try:
+            result = await self.repository.delete_all_data()
+            
+            # Métricas
+            diagnosis_counter.labels(operation="delete_all", status="success").inc()
+            diagnosis_duration.labels(operation="delete_all").observe(time.time() - start_time)
+            
+            logger.info("Todos los datos han sido eliminados exitosamente")
+            return result
+            
+        except Exception as e:
+            diagnosis_counter.labels(operation="delete_all", status="error").inc()
+            logger.error(f"Error eliminando todos los datos: {str(e)}")
+            raise e
