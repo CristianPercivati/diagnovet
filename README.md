@@ -32,7 +32,7 @@ FIRESTORE_CREDENTIALS=yourcredentials
 
 ```
 API_BASE_URL = yoururl <- localhost if running locally
-API_PORT = :yourport <- 8000
+API_PORT = yourport <- 8000
 ```
 
 ### - frontend/src/app/config.js:

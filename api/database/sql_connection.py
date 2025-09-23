@@ -6,6 +6,7 @@ from models.entities import Base
 from monitoring.metrics import metrics_collector
 import logging
 
+
 logger = logging.getLogger(__name__)
 
 class SQLConnection:
@@ -29,12 +30,15 @@ class SQLConnection:
         try:
             # Construir connection string
             connection_string = (
-                f"DRIVER={settings.sql_driver};"
-                f"SERVER={settings.sql_server};"
-                f"DATABASE={settings.sql_database};"
-                f"UID={settings.sql_user};"
-                f"Trusted_Connection=yes;"
-            )
+            f"DRIVER={settings.sql_driver};"
+            f"SERVER={settings.sql_server};"
+            f"DATABASE={settings.sql_database};"
+            f"UID={settings.sql_user};"
+            f"PWD={settings.sql_password};"
+            f"Encrypt=yes;"  # Necesario para Cloud SQL
+            f"TrustServerCertificate=yes;"  # Necesario para Cloud SQL
+            f"Connection Timeout=30;"  # Timeout más largo
+        )
             
             # Crear engine con pool de conexiones
             self._engine = create_engine(

@@ -1,8 +1,8 @@
 fastapi==0.117.1
-fitz==0.0.1.dev2
+PyMuPDF==1.24.9
 Pillow==11.3.0
 prometheus_client==0.21.1
-protobuf==6.32.1
+protobuf>=3.20.2,<6.0.0
 pydantic==2.11.9
 pydantic_settings==2.10.1
 python-dotenv==1.1.1
@@ -10,3 +10,6 @@ SQLAlchemy==2.0.31
 torch==2.6.0
 torchvision==0.21.0
 uvicorn==0.36.0
+pyodbc==5.1.0
+google-cloud-secret-manager==2.20.1
+google-cloud-firestore

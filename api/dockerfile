@@ -1,0 +1,51 @@
+# -----------------------
+# Base Python slim
+# -----------------------
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# -----------------------
+# Dependencias de sistema y ODBC Driver SQL Server
+# -----------------------
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl gnupg apt-transport-https ca-certificates \
+    unixodbc unixodbc-dev \
+    libgl1 libglib2.0-0 libfreetype6 libfontconfig1 \
+    libjpeg62-turbo libopenjp2-7 libtiff6 \
+    && curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get update \
+    && ACCEPT_EULA=Y apt-get install -y msodbcsql17 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# -----------------------
+# Copiar requirements
+# -----------------------
+COPY requirements.txt .
+
+# -----------------------
+# Instalar dependencias Python (Torch CPU-only ya en requirements)
+# -----------------------
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt \
+    --extra-index-url https://download.pytorch.org/whl/cpu
+
+RUN pip install --no-cache-dir python-multipart
+
+# -----------------------
+# Copiar aplicación
+# -----------------------
+COPY . .
+
+RUN mkdir -p extracted_images
+
+EXPOSE 8000
+
+# -----------------------
+# Comando de arranque
+# -----------------------
+ENV PYTHONPATH=/api
+
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

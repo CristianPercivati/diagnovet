@@ -1,0 +1,17 @@
+.env
+.git
+.gitignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+.env.production
+docker-compose.yml
+Dockerfile
+README.md
+tests/
+*.key.json
+.gitlab-ci.yml
+.idea/
+.vscode/
